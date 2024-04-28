@@ -1,5 +1,6 @@
 export const ROLE = {
-  EMPLOYER: "Employer",
+  CANDIDATE: "Candidate",
+  RECRUITER: "Recruiter",
 };
 
 export const MAX_UPLOAD_SIZE = 1024 * 1024 * 2;

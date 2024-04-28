@@ -1,7 +1,6 @@
 import NextAuth, { type DefaultSession, type User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
 import { authConfig } from "@/auth.config";
 import { API_ROUTES, ROLE } from "./constants";
 
@@ -34,7 +33,7 @@ async function getUser(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, role: ROLE.EMPLOYER }),
+        body: JSON.stringify({ email, password, role: ROLE.RECRUITER }),
       }
     );
     if (!res.ok) {
