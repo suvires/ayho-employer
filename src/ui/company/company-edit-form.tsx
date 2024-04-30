@@ -1,12 +1,12 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
-import { createCompany } from "@/lib/actions";
+import { updateCompany } from "@/lib/actions";
 import Image from "next/image";
 import { CREATE_COMPANY_STEPS } from "@/constants";
 import { ChangeEvent, useState } from "react";
 import { ProgressBar } from "@/ui/components/progress-bar";
-import { User } from "next-auth";
+import { Company } from "@/lib/definitions";
 import { readFileAsDataURL } from "@/lib/utils";
 import { CompanyImage } from "../components/company-image";
 import { z } from "zod";
@@ -17,15 +17,20 @@ interface FormErrors {
   image?: string[];
 }
 
-export default function CreateCompanyForm({ user }: { user: User }) {
+export default function EditCompanyForm({ company }: { company: Company }) {
   const initialState = { message: "", errors: {} };
-  const [state, dispatch] = useFormState(createCompany, initialState);
+  const [state, dispatch] = useFormState(updateCompany, initialState);
   const lastStep = CREATE_COMPANY_STEPS;
-  const [currentStep, setCurrentStep] = useState(0);
-  const [previewImage, setPreviewImage] = useState("");
+  const [currentStep, setCurrentStep] = useState(1);
+  const initialImageValue = `${process.env.NEXT_PUBLIC_BACKEND_URL}${company.image_url}`;
+  const [previewImage, setPreviewImage] = useState(initialImageValue);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [companyValue, setCompanyValue] = useState("");
-  const [descriptionValue, setDescriptionValue] = useState("");
+  const initialCompanyValue = company.name;
+  const [companyValue, setCompanyValue] = useState(initialCompanyValue);
+  const initialDescriptionValue = company.description;
+  const [descriptionValue, setDescriptionValue] = useState(
+    initialDescriptionValue
+  );
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyValue(e.target.value);
@@ -89,40 +94,17 @@ export default function CreateCompanyForm({ user }: { user: User }) {
 
   return (
     <>
-      {currentStep > 0 && (
-        <Image
-          src="/images/icons/back.png"
-          width={32}
-          height={60}
-          alt="Atrás"
-          className="back"
-          priority={true}
-          onClick={() => handleStep(-1)}
-        />
-      )}
+      <Image
+        src="/images/icons/back.png"
+        width={32}
+        height={60}
+        alt="Atrás"
+        className="back"
+        priority={true}
+        onClick={() => handleStep(-1)}
+      />
       <ProgressBar progress={(100 / lastStep) * currentStep} />
       <form className="form" action={dispatch}>
-        <div
-          className={`step ${currentStep > 0 ? "step--past" : ""} ${
-            currentStep === 0 ? "step--current" : ""
-          } ${currentStep < 0 ? "step--future" : ""}`}
-        >
-          <div className="form-group">
-            <h2>¡Hola, {user.name}!</h2>
-            <p>Antes de empezar a publicar ofertas, crea tu empresa.</p>
-          </div>
-          <div className="form-footer">
-            <button
-              type="button"
-              onClick={() => {
-                handleStep(1);
-              }}
-              className="btn btn--primary"
-            >
-              Comenzar
-            </button>
-          </div>
-        </div>
         <div
           className={`step ${currentStep > 1 ? "step--past" : ""} ${
             currentStep === 1 ? "step--current" : ""
@@ -136,6 +118,7 @@ export default function CreateCompanyForm({ user }: { user: User }) {
               type="text"
               placeholder="Escribe el nombre de la empresa"
               onChange={handleCompanyChange}
+              defaultValue={companyValue}
             />
             {errors?.name &&
               errors.name.map((error: string, index: number) => (
@@ -174,6 +157,7 @@ export default function CreateCompanyForm({ user }: { user: User }) {
               name="description"
               placeholder="Escribe una descripción de la empresa"
               onChange={handleDescriptionChange}
+              defaultValue={descriptionValue}
             />
             {errors?.description &&
               errors.description.map((error: string, index: number) => (
@@ -245,7 +229,7 @@ function FormButton() {
 
   return (
     <button className="btn btn--primary" aria-disabled={pending}>
-      Crear empresa
+      Actualizar empresa
     </button>
   );
 }

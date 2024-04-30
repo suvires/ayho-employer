@@ -55,8 +55,8 @@ export async function authenticate(prevState: any, formData: FormData) {
     }
     throw error;
   }
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/offers");
+  redirect("/offers");
 }
 
 const createUserSchema = z.object({
@@ -143,9 +143,9 @@ const createCompanySchema = z.object({
 });
 
 export async function createCompany(prevState: any, formData: FormData) {
-  const name = formData.get("company_name");
-  const description = formData.get("company_description");
-  const image = formData.get("company_image");
+  const name = formData.get("company");
+  const description = formData.get("description");
+  const image = formData.get("image");
 
   const validatedFields = createCompanySchema.safeParse({
     name,
@@ -191,32 +191,37 @@ export async function createCompany(prevState: any, formData: FormData) {
     };
   }
 
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/offers");
+  redirect("/offers");
 }
 
 const createOfferSchema = z.object({
   title: z.string().min(1, "El título es obligatorio"),
   description: z.string().min(1, "La descripción es obligatoria"),
-  salary: z
-    .string()
-    .min(1, "El salario es obligatorio")
-    .refine((val: any) => !isNaN(val), {
-      message: "El salario solo debe tener números",
-    }),
-  attendance_id: z.string().min(1, "La modalidad es obligatoria"),
-  schedule_id: z.string().min(1, "La jornada es obligatoria"),
-  skills: z.array(z.string()).min(1, "Selecciona al menos una habilidad"),
-  places: z.array(z.string()).min(1, "Selecciona al menos un lugar"),
-  positions: z.array(z.string()).min(1, "Selecciona al menos un rol"),
+  salary: z.string().min(1, "El salario es obligatorio"),
+  schedules: z.array(z.string()).nonempty({
+    message: "Selecciona al menos un tipo jornada",
+  }),
+  attendances: z.array(z.string()).nonempty({
+    message: "Selecciona al menos una modalidad",
+  }),
+  skills: z.array(z.string()).nonempty({
+    message: "Selecciona al menos una habilidad",
+  }),
+  places: z.array(z.string()).nonempty({
+    message: "Selecciona al menos una provincia",
+  }),
+  positions: z.array(z.string()).nonempty({
+    message: "Selecciona al menos un puesto",
+  }),
 });
 
 export async function createOffer(prevState: any, formData: FormData) {
   const title = formData.get("title");
   const description = formData.get("description");
   const salary = formData.get("salary");
-  const attendance_id = formData.get("attendance_id");
-  const schedule_id = formData.get("schedule_id");
+  const attendances = formData.getAll("attendances");
+  const schedules = formData.getAll("schedules");
   const positions = formData.getAll("positions");
   const skills = formData.getAll("skills");
   const places = formData.getAll("places");
@@ -225,8 +230,8 @@ export async function createOffer(prevState: any, formData: FormData) {
     title,
     description,
     salary,
-    attendance_id,
-    schedule_id,
+    attendances,
+    schedules,
     positions,
     skills,
     places,
@@ -254,8 +259,8 @@ export async function createOffer(prevState: any, formData: FormData) {
           title,
           description,
           salary,
-          attendance_id,
-          schedule_id,
+          attendances,
+          schedules,
           positions,
           skills,
           places,
@@ -275,6 +280,259 @@ export async function createOffer(prevState: any, formData: FormData) {
     };
   }
 
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/offers");
+  redirect("/offers");
+}
+
+const updateCompanySchema = z.object({
+  name: z.string().min(1, "El nombre es obligatorio"),
+  description: z.string().min(1, "La descripción es obligatoria"),
+  image: z
+    .any()
+    .refine((file) => {
+      if (file.size === 0) return true;
+      return (
+        !file ||
+        (file instanceof File && ACCEPTED_IMAGE_TYPES.includes(file.type))
+      );
+    }, "El archivo debe ser PNG, JPG o JPEG")
+    .refine(
+      (file) => file?.size < MAX_UPLOAD_SIZE,
+      "La imagen debe ocupar menos de 2MB."
+    ),
+});
+
+export async function updateCompany(prevState: any, formData: FormData) {
+  const name = formData.get("company");
+  const description = formData.get("description");
+  const image = formData.get("image") as File;
+
+  const validatedFields = updateCompanySchema.safeParse({
+    name,
+    description,
+    image,
+  });
+
+  if (!validatedFields.success) {
+    return {
+      ...prevState,
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Revisa los errores de validación",
+    };
+  }
+
+  const session = await auth();
+
+  try {
+    const bodyFormData = new FormData();
+    bodyFormData.append("name", name as string);
+    bodyFormData.append("description", description as string);
+    if (image && image.size > 0) {
+      bodyFormData.append("image", image);
+    }
+    const res = await fetch(
+      `${process.env.BACKEND_URL}/${API_ROUTES.UPDATE_COMPANY}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session!.accessToken}`,
+        },
+        body: bodyFormData,
+      }
+    );
+    if (!res.ok) {
+      const errorData = await res.json();
+      return {
+        ...prevState,
+        message: "API error: " + errorData.message,
+      };
+    }
+  } catch (error: any) {
+    return {
+      message: "Update company error: " + error.message,
+    };
+  }
+
+  revalidatePath("/profile");
+  redirect("/profile");
+}
+
+export async function deleteOffer(offerId: number) {
+  const session = await auth();
+  try {
+    const res = await fetch(
+      `${process.env.BACKEND_URL}/${API_ROUTES.DELETE_OFFER}/${offerId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session!.accessToken}`,
+        },
+      }
+    );
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error("API error:" + errorData.message);
+    }
+  } catch (error: any) {
+    return {
+      message: "Unmatch error: " + error.message,
+    };
+  }
+
+  revalidatePath("/offers");
+  redirect("/offers");
+}
+
+export async function publishOffer(offerId: number) {
+  const session = await auth();
+  try {
+    const res = await fetch(
+      `${process.env.BACKEND_URL}/${API_ROUTES.PUBLISH_OFFER}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session!.accessToken}`,
+        },
+        body: JSON.stringify({
+          id: offerId,
+        }),
+      }
+    );
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error("API error:" + errorData.message);
+    }
+  } catch (error: any) {
+    return {
+      message: "Unmatch error: " + error.message,
+    };
+  }
+
+  revalidatePath("/offers");
+  redirect("/offers");
+}
+
+export async function unpublishOffer(offerId: number) {
+  const session = await auth();
+  try {
+    const res = await fetch(
+      `${process.env.BACKEND_URL}/${API_ROUTES.UNPUBLISH_OFFER}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session!.accessToken}`,
+        },
+        body: JSON.stringify({
+          id: offerId,
+        }),
+      }
+    );
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error("API error:" + errorData.message);
+    }
+  } catch (error: any) {
+    return {
+      message: "Unmatch error: " + error.message,
+    };
+  }
+
+  revalidatePath("/offers");
+  redirect("/offers");
+}
+
+const updateOfferSchema = z.object({
+  title: z.string().min(1, "El título es obligatorio"),
+  description: z.string().min(1, "La descripción es obligatoria"),
+  salary: z.string().min(1, "El salario es obligatorio"),
+  schedules: z.array(z.string()).nonempty({
+    message: "Selecciona al menos un tipo jornada",
+  }),
+  attendances: z.array(z.string()).nonempty({
+    message: "Selecciona al menos una modalidad",
+  }),
+  skills: z.array(z.string()).nonempty({
+    message: "Selecciona al menos una habilidad",
+  }),
+  places: z.array(z.string()).nonempty({
+    message: "Selecciona al menos una provincia",
+  }),
+  positions: z.array(z.string()).nonempty({
+    message: "Selecciona al menos un puesto",
+  }),
+});
+
+export async function updateOffer(
+  offerId: number,
+  prevState: any,
+  formData: FormData
+) {
+  const title = formData.get("title");
+  const description = formData.get("description");
+  const salary = formData.get("salary");
+  const attendances = formData.getAll("attendances");
+  const schedules = formData.getAll("schedules");
+  const positions = formData.getAll("positions");
+  const skills = formData.getAll("skills");
+  const places = formData.getAll("places");
+
+  const validatedFields = updateOfferSchema.safeParse({
+    title,
+    description,
+    salary,
+    attendances,
+    schedules,
+    positions,
+    skills,
+    places,
+  });
+  if (!validatedFields.success) {
+    return {
+      ...prevState,
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Revisa los errores de validación",
+    };
+  }
+
+  const session = await auth();
+
+  try {
+    const res = await fetch(
+      `${process.env.BACKEND_URL}/${API_ROUTES.UPDATE_OFFER}/${offerId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session!.accessToken}`,
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          salary,
+          attendances,
+          schedules,
+          positions,
+          skills,
+          places,
+        }),
+      }
+    );
+    if (!res.ok) {
+      const errorData = await res.json();
+      return {
+        ...prevState,
+        message: "API Error: " + errorData,
+      };
+    }
+  } catch (error: any) {
+    return {
+      message: "Edit offer Error: " + error.message,
+    };
+  }
+
+  revalidatePath("/offers");
+  redirect("/offers");
 }

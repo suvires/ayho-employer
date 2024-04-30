@@ -1,0 +1,33 @@
+// -----------------------------------------------------------------------------
+// This file contains styles that are specific to the auth page.
+// -----------------------------------------------------------------------------
+.auth {
+  background: $brand-color;
+  background: linear-gradient(
+    -135deg,
+    $secondary-brand-color 0%,
+    $brand-color 100%
+  );
+  padding: 0 1rem;
+  justify-content: center;
+
+  .auth-wrapper {
+    h1 {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: auto;
+        height: 5rem;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+}

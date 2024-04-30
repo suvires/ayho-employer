@@ -1,35 +1,26 @@
 @charset "UTF-8";
 
 // 1. Configuration and helpers
-@import
-  'abstracts/variables',
-  'abstracts/functions',
-  'abstracts/mixins';
+@import "abstracts/variables", "abstracts/functions", "abstracts/mixins";
 
 // 2. Vendors
-@import
-  'vendors/normalize';
+@import "vendors/normalize";
 
 // 3. Base stuff
-@import
-  'base/base',
-  'base/fonts',
-  'base/typography',
-  'base/helpers';
+@import "base/base", "base/fonts", "base/typography", "base/helpers";
 
 // 4. Layout-related sections
-@import
-  'layout/header',
-  'layout/footer';
+@import "layout/app-header", "layout/footer", "layout/app";
 
 // 5. Components
-@import
-  'components/button';
+@import "components/button", "components/back", "components/form",
+  "components/progress-bar", "components/range", "components/tags",
+  "components/profile-image", "components/company-image", "components/navbar",
+  "components/card", "components/offers-cards", "components/matches",
+  "components/input-password", "components/submenu";
 
 // 6. Page-specific styles
-@import
-  'pages/home';
+@import "pages/home", "pages/auth", "pages/offers";
 
 // 7. Themes
-@import
-  'themes/default';
+@import "themes/default";

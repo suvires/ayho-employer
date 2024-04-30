@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
-import { createOffer } from "@/lib/actions";
+import { updateOffer } from "@/lib/actions";
 import Image from "next/image";
 import {
   Attendance,
@@ -9,12 +9,14 @@ import {
   Position,
   Skill,
   Place,
+  Offer,
 } from "@/lib/definitions";
 import { ProgressBar } from "@/ui/components/progress-bar";
 import { CREATE_OFFER_STEPS } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { title } from "process";
 
 interface FormErrors {
   title?: string[];
@@ -27,13 +29,15 @@ interface FormErrors {
   attendances?: string[];
 }
 
-export default function CreateOfferForm({
+export default function EditOfferForm({
+  offer,
   attendances,
   schedules,
   places,
   positions,
   skills,
 }: {
+  offer: Offer;
   attendances: Attendance[];
   schedules: Schedule[];
   places: Place[];
@@ -42,19 +46,33 @@ export default function CreateOfferForm({
 }) {
   const router = useRouter();
   const initialState = { message: "", errors: {} };
-  const [state, dispatch] = useFormState(createOffer, initialState);
+  const updateOfferWithId = updateOffer.bind(null, offer.id);
+  const [state, dispatch] = useFormState(updateOfferWithId, initialState);
   const lastStep = CREATE_OFFER_STEPS;
   const [currentStep, setCurrentStep] = useState(0);
-  const [titleValue, setTitleValue] = useState("");
-  const [descriptionValue, setDescriptionValue] = useState("");
+  const [titleValue, setTitleValue] = useState(offer.title);
+  const [descriptionValue, setDescriptionValue] = useState(offer.description);
   const salaryRangeRef = useRef<HTMLInputElement>(null);
   const salaryOutputRef = useRef<HTMLOutputElement>(null);
-  const [salaryValue, setSalaryValue] = useState("0");
-  const [positionsValue, setPositionsValue] = useState<number[]>([]);
-  const [skillsValue, setSkillsValue] = useState<number[]>([]);
-  const [placesValue, setPlacesValue] = useState<number[]>([]);
-  const [schedulesValue, setSchedulesValue] = useState<number[]>([]);
-  const [attendancesValue, setAttendancesValue] = useState<number[]>([]);
+  const [salaryValue, setSalaryValue] = useState(offer.salary.toString());
+  const initialPositionsValue = offer.positions.map((position) => position.id);
+  const [positionsValue, setPositionsValue] = useState<number[]>(
+    initialPositionsValue
+  );
+  const initialSkillsValue = offer.skills.map((skill) => skill.id);
+  const [skillsValue, setSkillsValue] = useState<number[]>(initialSkillsValue);
+  const initialPlacesValue = offer.places.map((place) => place.id);
+  const [placesValue, setPlacesValue] = useState<number[]>(initialPlacesValue);
+  const initialSchedulesValue = offer.schedules.map((schedule) => schedule.id);
+  const [schedulesValue, setSchedulesValue] = useState<number[]>(
+    initialSchedulesValue
+  );
+  const initialAttendancesValue = offer.attendances.map(
+    (attendance) => attendance.id
+  );
+  const [attendancesValue, setAttendancesValue] = useState<number[]>(
+    initialAttendancesValue
+  );
   const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
@@ -270,6 +288,7 @@ export default function CreateOfferForm({
               name="title"
               placeholder="Escribe el título de la oferta"
               onChange={handleTitleChange}
+              defaultValue={titleValue}
             />
             {errors?.title &&
               errors.title.map((error: string, index: number) => (
@@ -308,6 +327,7 @@ export default function CreateOfferForm({
               name="description"
               placeholder="Describe la oferta"
               onChange={handleDescriptionChange}
+              defaultValue={descriptionValue}
             />
             {errors?.description &&
               errors.description.map((error: string, index: number) => (
@@ -520,7 +540,7 @@ export default function CreateOfferForm({
                 step="1000"
                 id="salary"
                 name="salary"
-                defaultValue="0"
+                defaultValue={salaryValue}
                 onChange={handleSalaryChange}
               />
               {Number(salaryValue) > 0 && (
@@ -671,7 +691,7 @@ function FormButton() {
 
   return (
     <button className="btn btn--primary" aria-disabled={pending}>
-      Crear oferta
+      Actualizar oferta
     </button>
   );
 }

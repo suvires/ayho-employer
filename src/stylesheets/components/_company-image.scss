@@ -1,0 +1,28 @@
+.company-image {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  margin: 0 auto 1rem;
+
+  label {
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  figure {
+    background-color: linear-gradient(
+      to left,
+      $brand-color,
+      $secondary-brand-color
+    );
+    overflow: hidden;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+  }
+}

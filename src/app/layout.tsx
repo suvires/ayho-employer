@@ -14,8 +14,8 @@ const secondaryFont = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Ayho",
-  description: "Encuentra tu empleo",
+  title: "ayho",
+  description: "Encuentra perfiles",
 };
 
 export default function RootLayout({

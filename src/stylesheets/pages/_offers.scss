@@ -1,0 +1,9 @@
+.offers-list {
+  list-style: none;
+  padding: 0;
+  article {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

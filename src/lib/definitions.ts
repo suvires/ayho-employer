@@ -16,7 +16,7 @@ export type Company = {
   offers?: Offer[];
 };
 
-export type Profile = {
+export type User = {
   id: string;
   name: string;
   email: string;
@@ -29,6 +29,13 @@ export type Offer = {
   title: string;
   description: string;
   company_id: number;
+  salary: string;
+  published: boolean;
+  positions: Position[];
+  skills: Skill[];
+  schedules: Schedule[];
+  attendances: Attendance[];
+  places: Place[];
 };
 
 export type Attendance = {

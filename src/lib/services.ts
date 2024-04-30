@@ -21,10 +21,10 @@ export async function getMyCompanyOffers() {
   return res.json();
 }
 
-export async function getProfile() {
+export async function getOffer(offerId: string) {
   const session = await auth();
   const res = await fetch(
-    `${process.env.BACKEND_URL}/${API_ROUTES.GET_PROFILE}`,
+    `${process.env.BACKEND_URL}/${API_ROUTES.GET_COMPANY_OFFER}/${offerId}`,
     {
       method: "GET",
       headers: {
@@ -33,6 +33,21 @@ export async function getProfile() {
       },
     }
   );
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+}
+
+export async function getUser() {
+  const session = await auth();
+  const res = await fetch(`${process.env.BACKEND_URL}/${API_ROUTES.GET_USER}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session!.accessToken}`,
+    },
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }

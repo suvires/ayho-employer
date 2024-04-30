@@ -11,8 +11,7 @@ export default function Home() {
         height={129}
         priority
       />
-      <Link href="/signin">Iniciar sesión</Link>
-      <Link href="/signup">Crear una cuenta</Link>
+      <Link href="/auth">Empezar a selecionar</Link>
     </main>
   );
 }

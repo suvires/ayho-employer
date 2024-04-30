@@ -6,11 +6,11 @@ export default function OffersList({ offers }: { offers: Offer[] }) {
   if (offers.length === 0)
     return (
       <div>
-        <Link href="dashboard/offers/create">Publica tu primera oferta</Link>
+        <Link href="/create-offer">Publica tu primera oferta</Link>
       </div>
     );
   return (
-    <ul>
+    <ul className="offers-list">
       {offers.map((offer: Offer) => (
         <li key={offer.id}>
           <OfferItem offer={offer} />
