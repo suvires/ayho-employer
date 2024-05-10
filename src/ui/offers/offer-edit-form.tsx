@@ -14,9 +14,8 @@ import {
 import { ProgressBar } from "@/ui/components/progress-bar";
 import { CREATE_OFFER_STEPS } from "@/constants";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { title } from "process";
 
 interface FormErrors {
   title?: string[];
@@ -690,8 +689,8 @@ function FormButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button className="btn btn--primary" aria-disabled={pending}>
-      Actualizar oferta
+    <button className="btn btn--primary" disabled={pending}>
+      {pending ? "Cargando..." : "Actualizar oferta"}
     </button>
   );
 }

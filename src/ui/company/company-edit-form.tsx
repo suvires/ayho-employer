@@ -228,8 +228,8 @@ function FormButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button className="btn btn--primary" aria-disabled={pending}>
-      Actualizar empresa
+    <button className="btn btn--primary" disabled={pending}>
+      {pending ? "Cargando..." : "Actualizar empresa"}
     </button>
   );
 }

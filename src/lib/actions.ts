@@ -535,4 +535,5 @@ export async function updateOffer(
 
   revalidatePath("/offers");
   redirect("/offers");
+  return { message: "", errors: {} };
 }
