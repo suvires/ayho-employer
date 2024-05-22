@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Raleway, Open_Sans } from "next/font/google";
+import { Montserrat, Open_Sans } from "next/font/google";
 import "@/stylesheets/main.scss";
 
-const primaryFont = Raleway({
+const primaryFont = Open_Sans({
   subsets: ["latin"],
   variable: "--font-primary",
 });
 
-const secondaryFont = Open_Sans({
+const secondaryFont = Montserrat({
   subsets: ["latin"],
   variable: "--font-secondary",
 });
