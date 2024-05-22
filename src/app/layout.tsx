@@ -24,10 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={`${primaryFont.variable} ${secondaryFont.variable}`}>
-        {children}
-      </body>
+    <html
+      lang="es"
+      className={`${primaryFont.variable} ${secondaryFont.variable}`}
+    >
+      <body>{children}</body>
     </html>
   );
 }
