@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { Montserrat, Advent_Pro } from "next/font/google";
+import { Montserrat, Raleway } from "next/font/google";
 import "@/stylesheets/main.scss";
 
-const primaryFont = Advent_Pro({
+const primaryFont = Raleway({
+  adjustFontFallback: false,
   subsets: ["latin"],
   variable: "--font-primary",
 });
 
 const secondaryFont = Montserrat({
+  adjustFontFallback: false,
   subsets: ["latin"],
   variable: "--font-secondary",
 });
