@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Montserrat, Raleway } from "next/font/google";
+import { Montserrat, Advent_Pro } from "next/font/google";
 import "@/stylesheets/main.scss";
 
-const primaryFont = Raleway({
+const primaryFont = Advent_Pro({
   subsets: ["latin"],
   variable: "--font-primary",
 });
